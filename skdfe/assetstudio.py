@@ -105,8 +105,10 @@ def run_asset_extractions(
     if images_export_dir.exists():
         shutil.rmtree(images_export_dir)
     images_export_dir.mkdir(parents=True)
+    
+    assets_folder = sk_extracted_path / "assets"
     run_asset_studio_cli(
-        asset_studio_dir, unity_data, images_export_dir, "sprite", "export", ""
+        asset_studio_dir, assets_folder, images_export_dir, "sprite", "export", ""
     )
 
 

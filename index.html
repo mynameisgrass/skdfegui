@@ -308,7 +308,11 @@ function buildModel(snapshot) {
   const characters=charCodes.map((code,id) => ({type:'characters',id,code,...characterWeaponIds(code),skinIds:[...(skinIds.get(id)||[])].sort((a,b)=>a-b),skillIds:[...(skillIds.get(id)||[])].sort((a,b)=>a-b)}));
   const pets=petCodes.map((code,id) => ({type:'pets',id,code,skillIds:[...(petSkillIds.get(id)||[])].sort((a,b)=>a-b)}));
   const evolutionIds=new Set(Array.isArray(items.blueprint?.evolution) ? items.blueprint.evolution.map(id => id.replace(/^blueprint_evolution_/,'')) : []);
-  const weaponEntities=Object.keys(weapons).map(code => ({type:'weapons',code,english:weapons[code],skinIds:[...new Set(weaponSkins.weapons?.[code]?.UnlockedSkins || [])].sort(naturalCompare),hasEvolution:evolutionIds.has(code)||i18n.has(`desc_evolution_${code}`)}));
+  const weaponEntities=(weapons.weapons||[]).map(w => {
+    const code = w.name;
+    const eng = i18n.has(`weapon/${code}`) ? i18n.get(`weapon/${code}`)[0] : code;
+    return {type:'weapons',code,english:eng,skinIds:[...new Set(weaponSkins.weapons?.[code]?.UnlockedSkins || [])].sort(naturalCompare),hasEvolution:evolutionIds.has(code)||i18n.has(`desc_evolution_${code}`)};
+  });
   const weaponIds=new Set(weaponEntities.map(weapon=>weapon.code));
   for (const character of characters) for (const id of [character.starting,character.upgraded]) {
     if (!weaponIds.has(id) || !i18n.has(`weapon/${id}`)) throw new Error(`Character ${character.code} starting weapon is missing: ${id}`);

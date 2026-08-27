@@ -100,7 +100,12 @@ def main(root: Path | None = None) -> None:
         valid_ids = set()
         try:
             with open(paths.output("weapon_full.json"), encoding="utf-8") as f:
-                valid_ids.update(json.load(f).keys())
+                data = json.load(f)
+                valid_ids.update(w.get("name") for w in data.get("weapons", []))
+            with open(paths.output("weapon_skins.json"), encoding="utf-8") as f:
+                data = json.load(f)
+                for w in data.get("weapons", {}).values():
+                    valid_ids.update(w.get("UnlockedSkins", []))
             with open(paths.output("char_code_name.json"), encoding="utf-8") as f:
                 valid_ids.update(json.load(f))
             with open(paths.output("pet_code_name.json"), encoding="utf-8") as f:

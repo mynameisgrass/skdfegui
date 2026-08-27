@@ -136,10 +136,15 @@ def main(root: Path | None = None) -> None:
         logging.warning("Failed to copy images: %s", error)
 
     try:
-        if paths.data_dir.exists():
-            logging.info("Cleaned up data folder: %s", paths.data_dir)
+        if paths.export_dir.exists():
+            shutil.rmtree(paths.export_dir)
+            logging.info("Cleaned up export folder: %s", paths.export_dir)
+        for d in paths.data_dir.iterdir():
+            if d.is_dir() and (d.name == "AssetStudio" or d.name.startswith("sk-")):
+                shutil.rmtree(d)
+                logging.info("Cleaned up temporary directory: %s", d)
     except Exception as error:
-        logging.warning("Could not remove data folder (maybe in use): %s: %s", paths.data_dir, error)
+        logging.warning("Could not completely clean up temporary folders: %s", error)
     logging.info("All done.")
 
 

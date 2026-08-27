@@ -292,7 +292,6 @@ function buildModel(snapshot) {
   if (!Array.isArray(charCodes) || charCodes.some(v => typeof v !== 'string')) throw new Error('char_code_name.json must be a string array');
   if (!Array.isArray(petCodes) || petCodes.some(v => typeof v !== 'string')) throw new Error('pet_code_name.json must be a string array');
   assertObject(weapons,'weapons.json'); assertObject(weaponSkins,'weapon_skins.json'); assertObject(weaponSkins.weapons,'weapon_skins.json.weapons'); assertObject(items,'item.json'); assertObject(items.material,'item.json.material'); assertObject(items.blueprint,'item.json.blueprint');
-  if (!/^[0-9a-f]{40}$/.test(snapshot.sha)) throw new Error('Snapshot SHA is invalid');
   const i18n=parseLocalization(raw['I2language.csv']);
   const keys=[...i18n.keys()];
 
@@ -517,7 +516,7 @@ function renderHome() {
     root.append(el('p',{class:'muted',text:`${matches.length} matches across all pages`}),renderCards(matches));
   }
   root.append(el('h2',{text:'Data source'}),el('dl',{class:'stack'},
-    field('Repository',REPO),field('Game version',state.model.version,'version.json'),field('Commit',state.snapshot.sha),field('Snapshot time',new Date(state.snapshot.fetchedAt).toLocaleString())
+    field('Repository','mynameisgrass/skdfegui'),field('Game version',state.model.version,'version.json'),field('Commit','local data'),field('Snapshot time',new Date(state.snapshot.fetchedAt).toLocaleString())
   ));
   return root;
 }

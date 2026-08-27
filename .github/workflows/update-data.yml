@@ -10,35 +10,37 @@ permissions:
 
 jobs:
   update-data:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
-      - name: Checkout GUI Repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          path: 'gui-repo'
 
-      - name: Checkout SKDFE Repository
-        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          repository: 'aznoobnam/skdfe'
-          path: 'skdfe-repo'
+          python-version: '3.12'
 
-      - name: Copy Data Files
+      - name: Install dependencies
         run: |
-          mkdir -p gui-repo/data
-          cp skdfe-repo/*.json gui-repo/data/ || true
-          cp skdfe-repo/*.csv gui-repo/data/ || true
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Extraction Pipeline
+        run: |
+          python skdata.py
 
       - name: Commit and Push Changes
         run: |
-          cd gui-repo
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/
-          if git diff --staged --quiet; then
+          git status
+          if (git diff --staged --quiet) {
             echo "No changes in data files to commit."
-          else
-            git commit -m "chore(data): auto-update SKDFE data"
+          } else {
+            git commit -m "chore(data): auto-update SKDFE data and images"
             git push
-          fi
+          }
+        shell: pwsh

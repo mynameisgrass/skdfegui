@@ -438,9 +438,16 @@ function field(label,value,key='',status='') {
   if (key) dd.append(sourceKey(key));
   return el('div',{class:'field'},el('dt',{text:label}),dd);
 }
-function card(href,title,meta='',status='') {
+function card(href,title,meta='',status='',imgCode='') {
   const heading=el('h3',{text:title}); const mark=badge(status); if (mark) heading.append(' ',mark);
-  return el('a',{class:'card',href},heading,meta?el('p',{class:'key',text:meta}):null);
+  const content = [heading];
+  if (imgCode) {
+    const img = el('img', {src: `./data/images/${imgCode}.png`, class: 'card-img', alt: title});
+    img.onerror = () => img.style.display = 'none';
+    content.unshift(img);
+  }
+  if (meta) content.push(el('p',{class:'key',text:meta}));
+  return el('a',{class:'card',href},...content);
 }
 function routeParts() {
   try { return (location.hash.slice(1)||'/').split('?')[0].split('/').filter(Boolean).map(decodeURIComponent); }
@@ -531,12 +538,12 @@ function renderCards(entities) {
   const shown = sortedEntities.slice(0, MAX_RESULTS);
   const grid = el('div', { class: 'grid' });
   for (const entity of shown) {
-    if (entity.type === 'characters') { const name = characterName(entity); grid.append(card(routeFor('characters', entity.id), name.text, `ID ${entity.id} · ${entity.code}`, name.status)); }
-    else if (entity.type === 'pets') { const name = petName(entity); grid.append(card(routeFor('pets', entity.id), name.text, `ID ${entity.id} · ${entity.code}`, name.status)); }
-    else if (entity.type === 'weapons') { const name = weaponName(entity); grid.append(card(routeFor('weapons', entity.code), name.text, entity.code, name.status)); }
-    else if (entity.type === 'blueprints') { const name = blueprintName(entity); grid.append(card(routeFor('blueprints', entity.id), name.text, `${entity.group} · ${entity.id} · ${entity.itemId}`, name.status)); }
-    else if (entity.type === 'enemies') { const name = enemyName(entity); grid.append(card(routeFor('enemies', entity.key), name.text, `${entity.enemyType} · ${entity.key}${entity.enemyId ? ` · ${entity.enemyId}` : ''}`, name.status)); }
-    else { const name = inferMaterial(entity); grid.append(card(routeFor('materials', entity.id), name.text, `${entity.group} · ${entity.id}`, name.status)); }
+    if (entity.type === 'characters') { const name = characterName(entity); grid.append(card(routeFor('characters', entity.id), name.text, `ID ${entity.id} · ${entity.code}`, name.status, entity.code)); }
+    else if (entity.type === 'pets') { const name = petName(entity); grid.append(card(routeFor('pets', entity.id), name.text, `ID ${entity.id} · ${entity.code}`, name.status, entity.code)); }
+    else if (entity.type === 'weapons') { const name = weaponName(entity); grid.append(card(routeFor('weapons', entity.code), name.text, entity.code, name.status, entity.code)); }
+    else if (entity.type === 'blueprints') { const name = blueprintName(entity); grid.append(card(routeFor('blueprints', entity.id), name.text, `${entity.group} · ${entity.id} · ${entity.itemId}`, name.status, entity.id)); }
+    else if (entity.type === 'enemies') { const name = enemyName(entity); grid.append(card(routeFor('enemies', entity.key), name.text, `${entity.enemyType} · ${entity.key}${entity.enemyId ? ` · ${entity.enemyId}` : ''}`, name.status, entity.key)); }
+    else { const name = inferMaterial(entity); grid.append(card(routeFor('materials', entity.id), name.text, `${entity.group} · ${entity.id}`, name.status, entity.id)); }
   }
   const wrapper = el('div', {});
   if (entities.length > MAX_RESULTS) wrapper.append(el('p', { class: 'muted', text: `Showing ${MAX_RESULTS} of ${entities.length} matches. Refine search.` }));

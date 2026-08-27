@@ -27,6 +27,19 @@ def main(root: Path | None = None) -> None:
     except Exception as error:
         logging.error("Failed to get APK info: %s", error)
         sys.exit(1)
+        
+    try:
+        version_file = paths.data_dir / "version.json"
+        images_dir = paths.data_dir / "images"
+        if version_file.exists() and images_dir.exists():
+            import json
+            with open(version_file, "r") as f:
+                cached_version = json.load(f).get("version")
+            if cached_version == version:
+                logging.info("Data is already up to date with version %s. Skipping extraction.", version)
+                return
+    except Exception as e:
+        logging.warning("Failed to check cached version, proceeding with extraction: %s", e)
     try:
         sk_extracted = ensure_apk_extracted(paths, version, link)
     except Exception as error:
